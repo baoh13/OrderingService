@@ -132,6 +132,26 @@ namespace OrderingService.Tests
         }
 
         [Test]
+        public void OrdersController_Get_ReturnsTheSearchedProduct()
+        {
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Get));
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Coca"
+            };
+
+            OrdersRepository.OrderList = new List<Product> { product };
+
+            var result = ordersController.Get("Coca") as OkNegotiatedContentResult<Product>;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(product.Quantity, result.Content.Quantity);
+            Assert.AreEqual(product.Name, result.Content.Name);
+        }
+
+        [Test]
         public void OrdersController_Get_ReturnsAListOfOrderedProductsWithDetails()
         {
             var request = CreateRequest(HttpMethod.Post);

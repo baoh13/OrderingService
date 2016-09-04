@@ -30,6 +30,24 @@ namespace OrderingService.Controllers
             }
         }
 
+        // Changed the default rout to "api/orders/{name}"
+        public IHttpActionResult Get(string name)
+        {
+            try
+            {
+                var requestedProduct = _ordersRepository.GetProduct(name);
+                if (requestedProduct == null)
+                    return NotFound();
+
+                return Ok(requestedProduct);
+            }
+            catch (Exception)
+            {
+                // Log the error.
+                return InternalServerError();
+            }
+        }
+
         [HttpPost]
         public IHttpActionResult Post([FromBody]Product product)
         {
@@ -69,8 +87,8 @@ namespace OrderingService.Controllers
                 return InternalServerError();
             }
         }
-
-        [HttpDelete]
+        
+        // Changed the default rout to "api/orders/{name}"
         public IHttpActionResult Delete(string name)
         {
             try
