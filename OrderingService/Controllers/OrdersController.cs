@@ -1,33 +1,45 @@
 ﻿using OrderingService.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 
 namespace OrderingService.Controllers
 {
     public class OrdersController : ApiController
     {
-        private OrdersContext _context;
-
-        public OrdersController()
-        {
-            _context = new OrdersContext();
-        }
+        public static IList<Product> ProductList = new List<Product>();
 
         public IHttpActionResult Get()
         {
             try
             {
-                var product = new Product
-                {
-                    Id = 1,
-                    Name = "CocaCola",
-                    Quantity = 5
-                };
-                return Ok(product);
+                return Ok(ProductList.ToList());
             }
             catch (Exception)
             {
-                
+                // Log the error.
+                return InternalServerError();
+            }
+        }
+
+        [HttpPost]
+        public IHttpActionResult Post([FromBody]Product product)
+        {
+            try
+            {
+                if (product.Quantity < 0)
+                    return BadRequest($"Invalid quantity: {product.Quantity}");
+
+                ProductList.Add(product);
+
+                var url = Request.RequestUri + "/" + product.Name;
+
+                return Created(url, content: product);
+            }
+            catch (Exception)
+            {
+                //Log the error
                 return InternalServerError();
             }
         }
