@@ -30,7 +30,7 @@ namespace OWinTest
             {
                 httpClient.BaseAddress = new Uri(baseAddress);
                 httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
-                var response = httpClient.GetAsync("api/orders").Result;
+                var response = httpClient.GetAsync("/api/orders").Result;
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("Success");
