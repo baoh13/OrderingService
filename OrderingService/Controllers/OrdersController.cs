@@ -7,7 +7,14 @@ namespace OrderingService.Controllers
 {
     public class OrdersController : ApiController
     {
-        private readonly OrdersRepository _ordersRepository = new OrdersRepository();
+        private IOrdersRepository _ordersRepository = new OrdersRepository();
+
+        // In real application. Dependency injection is used instead. 
+        public IOrdersRepository OrdersRepository
+        {
+            get { return _ordersRepository; }
+            set { _ordersRepository = value; }
+        }
 
         public IHttpActionResult Get()
         {

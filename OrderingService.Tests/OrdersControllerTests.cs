@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using OrderingService.Controllers;
 using OrderingService.Models;
 using System;
@@ -13,6 +14,37 @@ namespace OrderingService.Tests
     [TestFixture]
     public class OrdersControllerTests
     {
+        [Test]
+        public void OrdersController_Get_ReturnsInternalError()
+        {
+            var ordersRepository = new Mock<IOrdersRepository>();
+
+            ordersRepository.Setup(r => r.GetProducts()).Throws(new Exception());
+
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Get));
+            ordersController.OrdersRepository = ordersRepository.Object;
+
+            var result = ordersController.Get() as InternalServerErrorResult;
+
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void OrdersController_Post_ReturnsInternalError()
+        {
+            var ordersRepository = new Mock<IOrdersRepository>();
+            var product = new Product();
+
+            ordersRepository.Setup(r => r.Add(product)).Throws(new Exception());
+
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Post));
+            ordersController.OrdersRepository = ordersRepository.Object;
+
+            var result = ordersController.Post(product) as InternalServerErrorResult;
+
+            Assert.IsNotNull(result);
+        }
+
         [Test]
         public void OrdersController_Get_ReturnsAListOfOrderedProductsWithDetails()
         {

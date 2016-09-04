@@ -2,7 +2,7 @@
 
 namespace OrderingService.Models
 {
-    public class OrdersRepository
+    public class OrdersRepository : IOrdersRepository
     {
         public static IList<Product> OrderList = new List<Product>();
         
