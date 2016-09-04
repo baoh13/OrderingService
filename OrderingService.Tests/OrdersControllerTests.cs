@@ -5,6 +5,7 @@ using OrderingService.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Results;
@@ -43,6 +44,91 @@ namespace OrderingService.Tests
             var result = ordersController.Post(product) as InternalServerErrorResult;
 
             Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void OrdersController_Put_ReturnsNotFound()
+        {
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Put));
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Coca"
+            };
+
+            OrdersRepository.OrderList = new List<Product>();
+
+            var result = ordersController.Put(product) as NotFoundResult;
+
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void OrdersController_Delete_ReturnsNotFound()
+        {
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Delete));
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Coca"
+            };
+
+            OrdersRepository.OrderList = new List<Product>();
+
+            var result = ordersController.Delete(product.Name) as NotFoundResult;
+
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void OrdersController_Delete_ReturnsNoContentResult()
+        {
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Delete));
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Coca"
+            };
+
+            OrdersRepository.OrderList = new List<Product>
+            {
+                product
+            };
+
+            var result = ordersController.Delete(product.Name) as StatusCodeResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+        }
+
+        [Test]
+        public void OrdersController_Put_ReturnsUpdatedProduct()
+        {
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Put));
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Coca"
+            };
+
+            OrdersRepository.OrderList = new List<Product>
+            {
+                product
+            };
+
+            var result = ordersController.Put(new Product
+            {
+                Quantity = 5,
+                Name = "Coca"
+            }) as OkNegotiatedContentResult<Product>;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(8, result.Content.Quantity);
+            Assert.AreEqual("Coca", result.Content.Name);
         }
 
         [Test]

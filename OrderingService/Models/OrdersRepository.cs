@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OrderingService.Models
 {
@@ -9,7 +11,30 @@ namespace OrderingService.Models
         public IEnumerable<Product> GetProducts()
         {
             return OrderList;
-        } 
+        }
+
+        public Product GetProduct(string name)
+        {
+            return OrderList.SingleOrDefault(p => p.Name == name);
+        }
+
+        public Product Update(Product product)
+        {
+            var requestedProduct = GetProduct(product.Name);
+
+            if (requestedProduct == null)
+                throw new ArgumentException($"Product {product.Name} does not exist.");
+
+            // Todo scenario quantity is negative
+            requestedProduct.Quantity += product.Quantity;
+
+            return requestedProduct;
+        }
+
+        public void Remove(Product requestedProduct)
+        {
+            OrderList.Remove(requestedProduct);
+        }
 
         public Product Add(Product product)
         {

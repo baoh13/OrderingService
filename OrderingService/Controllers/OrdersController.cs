@@ -1,6 +1,7 @@
 ﻿using OrderingService.Models;
 using System;
 using System.Linq;
+using System.Net;
 using System.Web.Http;
 
 namespace OrderingService.Controllers
@@ -9,7 +10,7 @@ namespace OrderingService.Controllers
     {
         private IOrdersRepository _ordersRepository = new OrdersRepository();
 
-        // In real application. Dependency injection is used instead. 
+        // In real applications. Dependency injection is used instead. 
         public IOrdersRepository OrdersRepository
         {
             get { return _ordersRepository; }
@@ -46,6 +47,44 @@ namespace OrderingService.Controllers
             catch (Exception)
             {
                 //Log the error
+                return InternalServerError();
+            }
+        }
+
+        [HttpPut]
+        public IHttpActionResult Put([FromBody] Product product)
+        {
+            try
+            {
+                var requestedProduct = _ordersRepository.GetProduct(product.Name);
+                if (requestedProduct == null)
+                    return NotFound();
+
+                requestedProduct = _ordersRepository.Update(product);
+
+                return Ok(requestedProduct);
+            }
+            catch (Exception)
+            {
+                return InternalServerError();
+            }
+        }
+
+        [HttpDelete]
+        public IHttpActionResult Delete(string name)
+        {
+            try
+            {
+                var requestedProduct = _ordersRepository.GetProduct(name);
+                if (requestedProduct == null)
+                    return NotFound();
+
+                _ordersRepository.Remove(requestedProduct);
+
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            catch (Exception)
+            {
                 return InternalServerError();
             }
         }

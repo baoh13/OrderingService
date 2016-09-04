@@ -6,5 +6,8 @@ namespace OrderingService.Models
     {
         Product Add(Product product);
         IEnumerable<Product> GetProducts();
+        Product GetProduct(string name);
+        Product Update(Product product);
+        void Remove(Product requestedProduct);
     }
 }
