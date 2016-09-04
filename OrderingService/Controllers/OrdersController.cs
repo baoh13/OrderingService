@@ -1,6 +1,5 @@
 ﻿using OrderingService.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 
@@ -8,13 +7,13 @@ namespace OrderingService.Controllers
 {
     public class OrdersController : ApiController
     {
-        public static IList<Product> ProductList = new List<Product>();
+        private readonly OrdersRepository _ordersRepository = new OrdersRepository();
 
         public IHttpActionResult Get()
         {
             try
             {
-                return Ok(ProductList.ToList());
+                return Ok(_ordersRepository.GetProducts().ToList());
             }
             catch (Exception)
             {
@@ -31,7 +30,7 @@ namespace OrderingService.Controllers
                 if (product.Quantity < 0)
                     return BadRequest($"Invalid quantity: {product.Quantity}");
 
-                ProductList.Add(product);
+                _ordersRepository.Add(product);
 
                 var url = Request.RequestUri + "/" + product.Name;
 

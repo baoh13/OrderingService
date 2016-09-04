@@ -1,37 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace OrderingService.Models
 {
     public class OrdersRepository
     {
-        private IList<Product> _orderList;
-
-        public OrdersRepository()
-        {
-            _orderList = new List<Product>();
-        }
-
-        public IList<Product> Products
-        {
-            get { return _orderList; }
-            set { _orderList = value; }
-        }
-
+        public static IList<Product> OrderList = new List<Product>();
+        
         public IEnumerable<Product> GetProducts()
         {
-            return _orderList.ToList();
+            return OrderList;
         } 
 
-        public Product Add(string drink, int quantity)
+        public Product Add(Product product)
         {
-            var product = new Product
-            {
-                Quantity = quantity,
-                Name = drink
-            };
-
-            _orderList.Add(product);
+            OrderList.Add(product);
 
             return product;
         }

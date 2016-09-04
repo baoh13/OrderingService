@@ -47,3 +47,7 @@ Temporary Items
 .apdisk
 /OrderingService/bin
 /OrderingService/obj/Debug
+/OrderingService.Tests/bin/Debug
+/OrderingService.Tests/obj/Debug
+/packages
+*.user

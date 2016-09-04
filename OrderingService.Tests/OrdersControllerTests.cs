@@ -25,7 +25,8 @@ namespace OrderingService.Tests
                 Quantity = 3,
                 Name = "Coca"
             };
-            OrdersController.ProductList = new List<Product> { product };
+
+            OrdersRepository.OrderList = new List<Product> { product };
 
             var result = ordersController.Get() as OkNegotiatedContentResult<List<Product>>;
 
@@ -40,7 +41,7 @@ namespace OrderingService.Tests
             var request = CreateRequest(HttpMethod.Get);
 
             var ordersController = CreateOrdersController(request);
-            OrdersController.ProductList = new List<Product>
+            OrdersRepository.OrderList = new List<Product>
             {
                 new Product
                 {
