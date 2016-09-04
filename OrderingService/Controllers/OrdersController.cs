@@ -2,13 +2,16 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Routing;
 
 namespace OrderingService.Controllers
 {
     public class OrdersController : ApiController
     {
         private IOrdersRepository _ordersRepository = new OrdersRepository();
+        private const int maxPageSize = 10;
 
         // In real applications. Dependency injection is used instead. 
         public IOrdersRepository OrdersRepository
@@ -17,11 +20,57 @@ namespace OrderingService.Controllers
             set { _ordersRepository = value; }
         }
 
-        public IHttpActionResult Get()
+        [HttpGet]
+        [Route("api/orders", Name = "OrdersList")]
+        public IHttpActionResult Get(int page = 1, int pageSize = maxPageSize)
         {
             try
             {
-                return Ok(_ordersRepository.GetProducts().ToList());
+                var products = _ordersRepository.GetProducts().ToList();
+
+                // ensure the page size isn't larger than the maximum.
+                if (pageSize > maxPageSize)
+                {
+                    pageSize = maxPageSize;
+                }
+
+                // calculate data for metadata
+                var totalCount = products.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                var urlHelper = new UrlHelper(Request);
+                var prevLink = page > 1 ? urlHelper.Link("OrdersList",
+                    new
+                    {
+                        page = page - 1,
+                        pageSize = pageSize
+                    }) : "";
+                var nextLink = page < totalPages ? urlHelper.Link("OrdersList",
+                    new
+                    {
+                        page = page + 1,
+                        pageSize = pageSize
+                    }) : "";
+
+                var paginationHeader = new
+                {
+                    currentPage = page,
+                    pageSize = pageSize,
+                    totalCount = totalCount,
+                    totalPages = totalPages,
+                    previousPageLink = prevLink,
+                    nextPageLink = nextLink
+                };
+
+
+                var response = Request.CreateResponse(HttpStatusCode.OK,
+                                                      products.Skip(pageSize * (page - 1))
+                                                              .Take(pageSize)
+                                                              .ToList());
+                
+                response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationHeader));
+
+                return ResponseMessage(response);
             }
             catch (Exception)
             {
@@ -49,6 +98,7 @@ namespace OrderingService.Controllers
         }
 
         [HttpPost]
+        [Route("api/orders")]
         public IHttpActionResult Post([FromBody]Product product)
         {
             try

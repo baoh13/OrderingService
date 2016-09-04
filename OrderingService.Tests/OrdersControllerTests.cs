@@ -15,6 +15,11 @@ namespace OrderingService.Tests
     [TestFixture]
     public class OrdersControllerTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+        }
+
         [Test]
         public void OrdersController_Get_ReturnsInternalError()
         {
@@ -154,10 +159,9 @@ namespace OrderingService.Tests
         [Test]
         public void OrdersController_Get_ReturnsAListOfOrderedProductsWithDetails()
         {
-            var request = CreateRequest(HttpMethod.Post);
-
+            var request = CreateRequest(HttpMethod.Get);
+            
             var ordersController = CreateOrdersController(request);
-
             var product = new Product
             {
                 Quantity = 3,
@@ -166,11 +170,15 @@ namespace OrderingService.Tests
 
             OrdersRepository.OrderList = new List<Product> { product };
 
-            var result = ordersController.Get() as OkNegotiatedContentResult<List<Product>>;
+            
+            var result = ordersController.Get() as ResponseMessageResult;
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(product.Quantity, result.Content.First().Quantity);
-            Assert.AreEqual(product.Name, result.Content.First().Name);
+            var products = (result.Response.Content as ObjectContent).Value as List<Product>;
+
+            Assert.IsNotNull(products);
+            Assert.AreEqual(product.Quantity, products.First().Quantity);
+            Assert.AreEqual(product.Name, products.First().Name);
         }
         
         [Test]
@@ -179,6 +187,8 @@ namespace OrderingService.Tests
             var request = CreateRequest(HttpMethod.Get);
 
             var ordersController = CreateOrdersController(request);
+            
+
             OrdersRepository.OrderList = new List<Product>
             {
                 new Product
@@ -193,10 +203,13 @@ namespace OrderingService.Tests
                 }
             };
 
-            var result = ordersController.Get() as OkNegotiatedContentResult<List<Product>>;
+            var result = ordersController.Get() as ResponseMessageResult;
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Content.Count);
+            var products = (result.Response.Content as ObjectContent).Value as List<Product>;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, products.Count);
         }
 
         [Test]
@@ -245,12 +258,13 @@ namespace OrderingService.Tests
             var ordersController = new OrdersController
             {
                 Configuration = new HttpConfiguration(),
-                Request = request
+                Request = request,
+                
             };
-            
+
             return ordersController;
         }
-
+        
         private HttpRequestMessage CreateRequest(HttpMethod method, Uri uri = null)
         {
             return new HttpRequestMessage
