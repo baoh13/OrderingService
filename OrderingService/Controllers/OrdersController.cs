@@ -8,6 +8,7 @@ using System.Web.Http.Routing;
 
 namespace OrderingService.Controllers
 {
+    [Authorize]
     public class OrdersController : ApiController
     {
         private IOrdersRepository _ordersRepository = new OrdersRepository();
