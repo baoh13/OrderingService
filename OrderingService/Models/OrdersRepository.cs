@@ -25,8 +25,8 @@ namespace OrderingService.Models
             if (requestedProduct == null)
                 throw new ArgumentException($"Product {product.Name} does not exist.");
 
-            // Todo scenario quantity is negative
-            requestedProduct.Quantity += product.Quantity;
+            
+            requestedProduct.Quantity = product.Quantity;
 
             return requestedProduct;
         }
@@ -38,9 +38,20 @@ namespace OrderingService.Models
 
         public Product Add(Product product)
         {
-            OrderList.Add(product);
+            var requestedProduct = GetProduct(product.Name);
 
-            return product;
+            // Todo scenario quantity is negative
+            if (requestedProduct != null)
+            {
+                requestedProduct.Quantity += product.Quantity;
+            }
+            else
+            {
+                requestedProduct = product;
+                OrderList.Add(requestedProduct);
+            }
+
+            return requestedProduct;
         }
     }
 }

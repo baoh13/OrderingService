@@ -1,5 +1,4 @@
-﻿using Moq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using OrderingService.Controllers;
 using OrderingService.Models;
 using System;
@@ -15,42 +14,6 @@ namespace OrderingService.Tests
     [TestFixture]
     public class OrdersControllerTests
     {
-        [SetUp]
-        public void SetUp()
-        {
-        }
-
-        [Test]
-        public void OrdersController_Get_ReturnsInternalError()
-        {
-            var ordersRepository = new Mock<IOrdersRepository>();
-
-            ordersRepository.Setup(r => r.GetProducts()).Throws(new Exception());
-
-            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Get));
-            ordersController.OrdersRepository = ordersRepository.Object;
-
-            var result = ordersController.Get() as InternalServerErrorResult;
-
-            Assert.IsNotNull(result);
-        }
-
-        [Test]
-        public void OrdersController_Post_ReturnsInternalError()
-        {
-            var ordersRepository = new Mock<IOrdersRepository>();
-            var product = new Product();
-
-            ordersRepository.Setup(r => r.Add(product)).Throws(new Exception());
-
-            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Post));
-            ordersController.OrdersRepository = ordersRepository.Object;
-
-            var result = ordersController.Post(product) as InternalServerErrorResult;
-
-            Assert.IsNotNull(result);
-        }
-
         [Test]
         public void OrdersController_Put_ReturnsNotFound()
         {
@@ -110,6 +73,31 @@ namespace OrderingService.Tests
         }
 
         [Test]
+        public void OrdersController_Put_ReturnsBadRequest()
+        {
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Put));
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Coca"
+            };
+
+            OrdersRepository.OrderList = new List<Product>
+            {
+                product
+            };
+
+            var result = ordersController.Put(new Product
+            {
+                Quantity = -5,
+                Name = "Coca"
+            }) as BadRequestErrorMessageResult;
+
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
         public void OrdersController_Put_ReturnsUpdatedProduct()
         {
             var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Put));
@@ -132,7 +120,7 @@ namespace OrderingService.Tests
             }) as OkNegotiatedContentResult<Product>;
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(8, result.Content.Quantity);
+            Assert.AreEqual(5, result.Content.Quantity);
             Assert.AreEqual("Coca", result.Content.Name);
         }
 
@@ -154,6 +142,24 @@ namespace OrderingService.Tests
             Assert.IsNotNull(result);
             Assert.AreEqual(product.Quantity, result.Content.Quantity);
             Assert.AreEqual(product.Name, result.Content.Name);
+        }
+
+        [Test]
+        public void OrdersController_Get_ReturnsNotFound()
+        {
+            var ordersController = CreateOrdersController(CreateRequest(HttpMethod.Get));
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Coca"
+            };
+
+            OrdersRepository.OrderList = new List<Product> { product };
+
+            var result = ordersController.Get("CocaNotFound") as NotFoundResult;
+
+            Assert.IsNotNull(result);
         }
 
         [Test]
@@ -222,15 +228,42 @@ namespace OrderingService.Tests
             var product = new Product
             {
                 Quantity = 3,
-                Name = "Pepsi"
+                Name = "Pepsi1"
             };
 
             var result = controller.Post(product) as CreatedNegotiatedContentResult<Product>;
 
             Assert.IsNotNull(result);
-            Assert.AreEqual("http://localhost/api/orders/Pepsi", result.Location.ToString());
+            Assert.AreEqual("http://localhost/api/orders/Pepsi1", result.Location.ToString());
             Assert.AreEqual(product.Name, result.Content.Name);
             Assert.AreEqual(product.Quantity, result.Content.Quantity);
+        }
+
+        [Test]
+        public void OrdersController_Post_MultipleTimesOfTheSameProduct()
+        {
+            var request = CreateRequest(HttpMethod.Post);
+
+            var controller = CreateOrdersController(request: request);
+
+            var product = new Product
+            {
+                Quantity = 3,
+                Name = "Pepsi"
+            };
+
+            controller.Post(product);
+
+            var result = controller.Post(new Product
+            {
+                Name = "Pepsi",
+                Quantity = 5
+            }) as CreatedNegotiatedContentResult<Product>;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("http://localhost/api/orders/Pepsi", result.Location.ToString());
+            Assert.AreEqual(product.Name, result.Content.Name);
+            Assert.AreEqual(8, result.Content.Quantity);
         }
 
         [Test]
