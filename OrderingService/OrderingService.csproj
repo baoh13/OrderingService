@@ -137,10 +137,7 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Persistence\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
@@ -153,8 +150,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\AuthDbContext.mdf" />
+    <Content Include="App_Data\AuthDbContext_log.ldf">
+      <DependentUpon>AuthDbContext.mdf</DependentUpon>
+    </Content>
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Metadata\deploymentTemplates\apiappconfig.azureresource.json" />
     <Content Include="packages.config">
       <SubType>Designer</SubType>
@@ -173,10 +176,10 @@
       <DependentUpon>201609041644357_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\AuthDbContext.cs" />
-    <Compile Include="Models\IOrdersRepository.cs" />
-    <Compile Include="Models\OrdersRepository.cs" />
     <Compile Include="Models\Product.cs" />
+    <Compile Include="Persistence\AuthDbContext.cs" />
+    <Compile Include="Persistence\IOrdersRepository.cs" />
+    <Compile Include="Persistence\OrdersRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

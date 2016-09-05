@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
 
-namespace OrderingService.Models
+namespace OrderingService.Persistence
 {
     public class AuthDbContext : IdentityDbContext
     {

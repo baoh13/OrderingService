@@ -1,3 +1,5 @@
+using OrderingService.Persistence;
+
 namespace OrderingService.Migrations
 {
     using System;
@@ -5,7 +7,7 @@ namespace OrderingService.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<OrderingService.Models.AuthDbContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<AuthDbContext>
     {
         public Configuration()
         {
@@ -13,7 +15,7 @@ namespace OrderingService.Migrations
             ContextKey = "OrderingService.Models.AuthDbContext";
         }
 
-        protected override void Seed(OrderingService.Models.AuthDbContext context)
+        protected override void Seed(AuthDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 

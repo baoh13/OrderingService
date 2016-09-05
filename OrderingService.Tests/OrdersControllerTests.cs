@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using OrderingService.Controllers;
 using OrderingService.Models;
+using OrderingService.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;

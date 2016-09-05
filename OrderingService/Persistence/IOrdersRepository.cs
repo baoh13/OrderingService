@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using OrderingService.Models;
 
-namespace OrderingService.Models
+namespace OrderingService.Persistence
 {
     public interface IOrdersRepository
     {
